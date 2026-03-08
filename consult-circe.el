@@ -21,7 +21,8 @@
 ;; Based on helm-circe by Les Harris <les@lesharris.com>
 ;; (https://github.com/lesharris/helm-circe) to the completing-read ecosystem.
 ;;
-;; Marginalia annotations are registered automatically if marginalia is loaded.
+;; Each candidate is annotated with its type
+;; (channel, server, query) and its parent server name.
 ;;
 ;; Entry points:
 ;;
@@ -73,6 +74,22 @@
           (consult-circe--server-buffers)))
 
 ;;; ---------------------------------------------------------------------------
+;;; Faces
+;;; ---------------------------------------------------------------------------
+
+(defface consult-circe-buffer-face
+  '((t :inherit consult-buffer))
+  "Face for circe buffer (channel, server, query) names.")
+
+(defface consult-circe-type-face
+  '((t :inherit help-key-binding))
+  "Face for the buffer type annotation (channel, server, query).")
+
+(defface consult-circe-server-face
+  '((t :inherit font-lock-comment-face))
+  "Face for the parent server name annotation.")
+
+;;; ---------------------------------------------------------------------------
 ;;; Annotation
 ;;; ---------------------------------------------------------------------------
 
@@ -89,10 +106,10 @@
            (server     (when (and server-buf (buffer-live-p server-buf))
                          (buffer-name server-buf))))
       (concat " "
-              (propertize type 'face 'marginalia-type)
+              (propertize type 'face 'consult-circe-type-face)
               (when server
                 (concat "  "
-                        (propertize server 'face 'marginalia-value)))))))
+                        (propertize server 'face 'consult-circe-server-face)))))))
 
 ;;; ---------------------------------------------------------------------------
 ;;; consult--source plists
@@ -101,7 +118,7 @@
 (defvar consult-circe--source-channels
   `(:name      "Channels"
     :category  circe-buffer
-    :face      circe-prompt-face
+    :face      consult-circe-buffer-face
     :annotate  ,#'consult-circe--annotate
     :items     ,#'consult-circe--channel-buffers
     :action    ,(lambda (buf) (switch-to-buffer buf)))
@@ -110,7 +127,7 @@
 (defvar consult-circe--source-queries
   `(:name      "Queries"
     :category  circe-buffer
-    :face      circe-prompt-face
+    :face      consult-circe-buffer-face
     :annotate  ,#'consult-circe--annotate
     :items     ,#'consult-circe--query-buffers
     :action    ,(lambda (buf) (switch-to-buffer buf)))
@@ -119,7 +136,7 @@
 (defvar consult-circe--source-servers
   `(:name      "Servers"
     :category  circe-buffer
-    :face      circe-server-face
+    :face      consult-circe-buffer-face
     :annotate  ,#'consult-circe--annotate
     :items     ,#'consult-circe--server-buffers
     :action    ,(lambda (buf) (switch-to-buffer buf)))
@@ -141,11 +158,13 @@
 (defun consult-circe-kill-buffer ()
   "Interactively select and kill a circe buffer (part/disconnect/close)."
   (interactive)
-  (let* ((bufs (consult-circe--all-buffers))
-         (choice (completing-read "Kill circe buffer: " bufs nil t)))
-    (when-let ((buf (get-buffer choice)))
-      (kill-buffer buf)
-      (message "Killed %s" choice))))
+  (let ((bufs (consult-circe--all-buffers)))
+    (if bufs
+        (let ((choice (completing-read "Kill circe buffer: " bufs nil t)))
+          (when-let ((buf (get-buffer choice)))
+            (kill-buffer buf)
+            (message "Killed %s" choice)))
+      (message "No circe buffers."))))
 
 ;;; ---------------------------------------------------------------------------
 ;;; By-server grouping
@@ -170,23 +189,28 @@
 
 ;;;###autoload
 (defun consult-circe ()
-  "Switch to a circe channel, query, or server buffer."
+  "Switch to a circe channel, query, or server buffer.
+Candidates are grouped by type (Channels / Queries / Servers)."
   (interactive)
-  (consult--multi '(consult-circe--source-channels
-                    consult-circe--source-queries
-                    consult-circe--source-servers)
-                  :prompt "Circe: "
-                  :require-match t
-                  :sort nil))
+  (if (consult-circe--all-buffers)
+      (consult--multi '(consult-circe--source-channels
+                        consult-circe--source-queries
+                        consult-circe--source-servers)
+                      :prompt "Circe: "
+                      :require-match t
+                      :sort nil)
+    (message "No circe buffers.")))
 
 ;;;###autoload
 (defun consult-circe-new-activity ()
   "Switch to a circe buffer that has new unread activity."
   (interactive)
-  (consult--multi '(consult-circe--source-new-activity)
-                  :prompt "New activity: "
-                  :require-match t
-                  :sort nil))
+  (if (consult-circe--recent-buffers)
+      (consult--multi '(consult-circe--source-new-activity)
+                      :prompt "New activity: "
+                      :require-match t
+                      :sort nil)
+    (message "No circe buffers with new activity.")))
 
 ;;;###autoload
 (defun consult-circe-by-server ()
@@ -204,28 +228,34 @@
 (defun consult-circe-channels ()
   "Switch to a circe channel buffer."
   (interactive)
-  (consult--multi '(consult-circe--source-channels)
-                  :prompt "Channel: "
-                  :require-match t
-                  :sort nil))
+  (if (consult-circe--channel-buffers)
+      (consult--multi '(consult-circe--source-channels)
+                      :prompt "Channel: "
+                      :require-match t
+                      :sort nil)
+    (message "No circe channel buffers.")))
 
 ;;;###autoload
 (defun consult-circe-servers ()
   "Switch to a circe server buffer."
   (interactive)
-  (consult--multi '(consult-circe--source-servers)
-                  :prompt "Server: "
-                  :require-match t
-                  :sort nil))
+  (if (consult-circe--server-buffers)
+      (consult--multi '(consult-circe--source-servers)
+                      :prompt "Server: "
+                      :require-match t
+                      :sort nil)
+    (message "No circe server buffers.")))
 
 ;;;###autoload
 (defun consult-circe-queries ()
   "Switch to a circe query buffer."
   (interactive)
-  (consult--multi '(consult-circe--source-queries)
-                  :prompt "Query: "
-                  :require-match t
-                  :sort nil))
+  (if (consult-circe--query-buffers)
+      (consult--multi '(consult-circe--source-queries)
+                      :prompt "Query: "
+                      :require-match t
+                      :sort nil)
+    (message "No circe query buffers.")))
 
 (provide 'consult-circe)
 
