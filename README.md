@@ -2,11 +2,9 @@
 
 Consult bindings for managing Circe buffers.
 
-A port of [helm-circe](https://github.com/lesharris/helm-circe) by [Les Harris](https://github.com/lesharris) to the [consult](https://github.com/minad/consult)/[marginalia](https://github.com/minad/marginalia) ecosystem.
+A port of [helm-circe](https://github.com/lesharris/helm-circe) by [Les Harris](https://github.com/lesharris) to the [consult](https://github.com/minad/consult).
 
 A call to `consult-circe` will show a grouped list of server, channel, and query buffers currently open. From the list you can switch to any buffer, or use `consult-circe-kill-buffer` to part/disconnect/close one.
-
-If [marginalia](https://github.com/minad/marginalia) is installed, each candidate is annotated with its type (channel, server, or query) and the name of its parent server.
 
 # Setup
 
