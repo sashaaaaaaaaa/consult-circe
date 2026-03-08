@@ -1,52 +1,43 @@
-[![MELPA](http://melpa.org/packages/helm-circe-badge.svg)](http://melpa.org/#/helm-circe) [![MELPA Stable](http://stable.melpa.org/packages/helm-circe-badge.svg)](http://stable.melpa.org/#/helm-circe)
-# helm-circe
+# consult-circe
 
-Helm bindings for managing circe buffers.
+Consult bindings for managing Circe buffers.
 
-Manage circe buffers easily with Helm.
+A port of [helm-circe](https://github.com/lesharris/helm-circe) by [Les Harris](https://github.com/lesharris) to the [consult](https://github.com/minad/consult)/[marginalia](https://github.com/minad/marginalia) ecosystem.
 
-A call to `helm-circe` will show a list of server, channel, and query
-buffers currently open. From the list, you can easily switch to any
-particular buffer or close that buffer which will then perform the
-correct action server side (e.g.; if you close a channel buffer, circe
-will /part you from that channel). Also, helm-circe supports helm
-selections so you can select multiple buffers of all types and close
-them in bulk if desired.
+A call to `consult-circe` will show a grouped list of server, channel, and query buffers currently open. From the list you can switch to any buffer, or use `consult-circe-kill-buffer` to part/disconnect/close one.
 
-![helm-circe](helm-circe.png)
+If [marginalia](https://github.com/minad/marginalia) is installed, each candidate is annotated with its type (channel, server, or query) and the name of its parent server.
 
 # Setup
 
-Invoke `helm-circe` and bind it to a keyboard shortcut.  See Commands
-for additional commands that you might want to key bind.
-
-```
-(require 'helm-circe)
-(global-set-key (kbd "C-c c i") 'helm-circe)
-; Handy to have a binding to helm-circe-new-activity
-(global-set-key (kbd "C-c c n") 'helm-circe-new-activity)
+```elisp
+(require 'consult-circe)
+(global-set-key (kbd "C-c c i") 'consult-circe)
+(global-set-key (kbd "C-c c n") 'consult-circe-new-activity)
+(global-set-key (kbd "C-c c k") 'consult-circe-kill-buffer)
 ```
 
 # Commands
-`helm-circe`
-Main command that displays channels, queries, and servers in different
-sections of the candidate list.
 
-`helm-circe-new-activity`
-Displays a candidate list of channels that have had activity since
-last viewed. Mirrors what tracking-mode puts in the mode line... but
-in helm so much faster.
+`consult-circe`
+Main command. Displays channels, queries, and servers in grouped sections.
 
-`helm-circe-by-server`
-Displays a candidate list of channels with each channel in a specific
-server section in the candidate list.
+`consult-circe-new-activity`
+Displays buffers that have had activity since last viewed, mirroring what
+tracking-mode shows in the mode line.
 
-`helm-circe-channels`
+`consult-circe-by-server`
+Displays channels grouped by the server they belong to.
+
+`consult-circe-channels`
 Displays all channels in a single candidate list regardless of server.
 
-`helm-circe-servers`
-Displays all circe server buffers in a candidate list.
+`consult-circe-servers`
+Displays all circe server buffers.
 
-`helm-circe-queries`
-Displays all circe query buffers in a candidate list.
+`consult-circe-queries`
+Displays all circe query buffers.
 
+`consult-circe-kill-buffer`
+Prompts for a circe buffer to kill. Closing a channel buffer will /part
+you from that channel; closing a server buffer will disconnect.
