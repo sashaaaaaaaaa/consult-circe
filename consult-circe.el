@@ -1,4 +1,4 @@
-;;; consult-circe.el --- consult circe buffer management -*- lexical-binding: t -*-
+;;; consult-circe.el --- Consult interface for Circe IRC buffers -*- lexical-binding: t -*-
 
 ;; Original work Copyright (C) 2015 Les Harris <les@lesharris.com>
 ;; Modified work Copyright (C) 2026 Sasha Abbott <sashaa@disroot.org>
@@ -17,10 +17,10 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;; Author: Sasha Abbott <sashaa@disroot.org>
-;; URL: https://github.com/sashaaaaaaaaa/consult-circe/
+;; URL: https://github.com/sashaaaaaaaaa/consult-circe
 ;; Version: 0.1
-;; Package-Requires: ((emacs "27.1") (consult "0.0") (circe "0.0"))
-;; Keywords: consult circe irc
+;; Package-Requires: ((emacs "27.1") (consult "3.3") (circe "2.14"))
+;; Keywords: comm
 
 ;;; Commentary:
 
