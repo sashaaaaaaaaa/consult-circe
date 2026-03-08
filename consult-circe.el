@@ -10,6 +10,7 @@
 
 ;; Author: Sasha Abbott <sashaa@disroot.org>
 ;; URL: https://github.com/sashaaaaaaaaa/consult-circe/
+;; Version: 0.1
 ;; Package-Requires: ((emacs "27.1") (consult "0.34") (circe "0.0"))
 ;; Keywords: consult circe irc
 
