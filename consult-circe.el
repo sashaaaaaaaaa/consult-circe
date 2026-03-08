@@ -159,7 +159,7 @@
   "Consult source for circe buffers with recent activity.")
 
 ;;; ---------------------------------------------------------------------------
-;;; Standalone kill command (replaces Helm's "Close marked items" action)
+;;; Kill command
 ;;; ---------------------------------------------------------------------------
 
 ;;;###autoload
