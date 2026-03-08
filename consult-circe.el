@@ -73,24 +73,26 @@
           (consult-circe--server-buffers)))
 
 ;;; ---------------------------------------------------------------------------
-;;; Marginalia annotator
+;;; Annotation
 ;;; ---------------------------------------------------------------------------
 
-(defun marginalia-annotate-circe-buffer (candidate)
-  "Annotate CANDIDATE (a circe buffer name) with type and server."
-  (when-let* ((buf (get-buffer candidate))
+(defun consult-circe--annotate (candidate)
+  "Return an annotation string for the circe buffer named CANDIDATE."
+  (when-let* ((buf  (get-buffer candidate))
               (mode (buffer-local-value 'major-mode buf)))
-    (marginalia--fields
-     ((pcase mode
-        ('circe-channel-mode "channel")
-        ('circe-server-mode  "server")
-        ('circe-query-mode   "query")
-        (_                   "circe"))
-      :face 'marginalia-type)
-     ((when-let ((server (buffer-local-value 'circe-server-buffer buf)))
-        (and (buffer-live-p server) (buffer-name server)))
-      :face 'marginalia-value
-      :truncate 24))))
+    (let* ((type (pcase mode
+                   ('circe-channel-mode "channel")
+                   ('circe-server-mode  "server")
+                   ('circe-query-mode   "query")
+                   (_                   "circe")))
+           (server-buf (buffer-local-value 'circe-server-buffer buf))
+           (server     (when (and server-buf (buffer-live-p server-buf))
+                         (buffer-name server-buf))))
+      (concat " "
+              (propertize type 'face 'marginalia-type)
+              (when server
+                (concat "  "
+                        (propertize server 'face 'marginalia-value)))))))
 
 ;;; ---------------------------------------------------------------------------
 ;;; consult--source plists
@@ -104,7 +106,7 @@
   `(:name      "Channels"
     :category  circe-buffer
     :face      circe-prompt-face
-    :annotate  ,#'marginalia-annotate-circe-buffer
+    :annotate  ,#'consult-circe--annotate
     :items     ,#'consult-circe--channel-buffers
     :action    ,(lambda (buf) (switch-to-buffer buf)))
   "Consult source for circe channel buffers.")
@@ -113,7 +115,7 @@
   `(:name      "Queries"
     :category  circe-buffer
     :face      circe-prompt-face
-    :annotate  ,#'marginalia-annotate-circe-buffer
+    :annotate  ,#'consult-circe--annotate
     :items     ,#'consult-circe--query-buffers
     :action    ,(lambda (buf) (switch-to-buffer buf)))
   "Consult source for circe query buffers.")
@@ -122,7 +124,7 @@
   `(:name      "Servers"
     :category  circe-buffer
     :face      circe-server-face
-    :annotate  ,#'marginalia-annotate-circe-buffer
+    :annotate  ,#'consult-circe--annotate
     :items     ,#'consult-circe--server-buffers
     :action    ,(lambda (buf) (switch-to-buffer buf)))
   "Consult source for circe server buffers.")
@@ -130,7 +132,7 @@
 (defvar consult-circe--source-new-activity
   `(:name      "New Activity"
     :category  circe-buffer
-    :annotate  ,#'marginalia-annotate-circe-buffer
+    :annotate  ,#'consult-circe--annotate
     :items     ,#'consult-circe--recent-buffers
     :action    ,(lambda (buf) (switch-to-buffer buf)))
   "Consult source for circe buffers with recent activity.")
@@ -141,9 +143,7 @@
 
 ;;;###autoload
 (defun consult-circe-kill-buffer ()
-  "Interactively select and kill a circe buffer (part/disconnect/close).
-Completing-read lets you kill one buffer at a time; call repeatedly or
-use a prefix argument loop in your own wrapper if you need bulk kills."
+  "Interactively select and kill a circe buffer (part/disconnect/close)."
   (interactive)
   (let* ((bufs (consult-circe--all-buffers))
          (choice (completing-read "Kill circe buffer: " bufs nil t)))
@@ -163,7 +163,7 @@ use a prefix argument loop in your own wrapper if you need bulk kills."
        (let ((bufs (mapcar #'buffer-name (circe-server-chat-buffers))))
          `(:name     ,server-name
            :category circe-buffer
-           :annotate ,#'marginalia-annotate-circe-buffer
+           :annotate ,#'consult-circe--annotate
            :items    ,(lambda () bufs)
            :action   ,(lambda (buf) (switch-to-buffer buf))))))
    (seq-filter #'get-buffer (consult-circe--server-buffers))))
@@ -174,9 +174,7 @@ use a prefix argument loop in your own wrapper if you need bulk kills."
 
 ;;;###autoload
 (defun consult-circe ()
-  "Switch to a circe channel, query, or server buffer.
-Candidates are grouped by type (Channels / Queries / Servers).
-To kill/part a buffer instead, use `consult-circe-kill-buffer'."
+  "Switch to a circe channel, query, or server buffer."
   (interactive)
   (consult--multi '(consult-circe--source-channels
                     consult-circe--source-queries
