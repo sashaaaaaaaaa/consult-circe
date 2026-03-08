@@ -98,10 +98,6 @@
 ;;; consult--source plists
 ;;; ---------------------------------------------------------------------------
 
-;; Note: consult--multi overrides :category to 'multi-category for the
-;; completing-read call, so marginalia category dispatch won't fire.
-;; Annotations are wired in directly via :annotate instead.
-
 (defvar consult-circe--source-channels
   `(:name      "Channels"
     :category  circe-buffer
