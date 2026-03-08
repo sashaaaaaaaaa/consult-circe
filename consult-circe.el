@@ -114,7 +114,7 @@
            (server     (when (and server-buf (buffer-live-p server-buf))
                          (buffer-name server-buf))))
       (concat " "
-              (propertize type 'face 'consult-circe-type-face)
+              (propertize (format "%-7s" type) 'face 'consult-circe-type-face)
               (when server
                 (concat "  "
                         (propertize server 'face 'consult-circe-server-face)))))))
