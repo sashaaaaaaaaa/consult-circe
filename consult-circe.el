@@ -27,7 +27,7 @@
 ;; Jump to Circe buffers with Consult.
 ;;
 ;; Based on helm-circe by Les Harris <les@lesharris.com>
-;; (https://github.com/lesharris/helm-circe) to the completing-read ecosystem.
+;; (https://github.com/lesharris/helm-circe)
 ;;
 ;; Each candidate is annotated with its type
 ;; (channel, server, query) and its parent server name.
