@@ -2,20 +2,34 @@
 
 Consult bindings for managing Circe buffers.
 
-A port of [helm-circe](https://github.com/lesharris/helm-circe) by [Les Harris](https://github.com/lesharris) to [consult.el](https://github.com/minad/consult).
+A port of [helm-circe](https://github.com/lesharris/helm-circe) by [Les Harris](https://github.com/lesharris) to the [consult](https://github.com/minad/consult) ecosystem.
 
-A call to `consult-circe` will show a grouped list of server, channel, and query buffers currently open. From the list you can switch to any buffer, or use `consult-circe-kill-buffer` to part/disconnect/close one.
+A call to `consult-circe` will show a grouped list of server, channel, and query buffers currently open. Each candidate is annotated with its type and parent server name.
 
-# Setup
+## Embark integration
+
+If [embark](https://github.com/oantolin/embark) is installed, additional actions are available on any candidate via `embark-act`:
+
+| Key | Action |
+|-----|--------|
+| `s` | Switch to buffer |
+| `k` | Kill/part buffer |
+
+To kill multiple buffers at once — equivalent to ibuffer's mark-and-delete — use `embark-act` then `E` to run `embark-export`, which opens the candidates in an Ibuffer buffer where you can mark and kill with the usual ibuffer commands.
+
+## Setup
 
 ```elisp
 (require 'consult-circe)
 (global-set-key (kbd "C-c c i") 'consult-circe)
 (global-set-key (kbd "C-c c n") 'consult-circe-new-activity)
 (global-set-key (kbd "C-c c k") 'consult-circe-kill-buffer)
+
+;; Optional: bind embark-export for ibuffer-style bulk kill
+(keymap-set minibuffer-local-map "C-c e" #'embark-export)
 ```
 
-# Commands
+## Commands
 
 `consult-circe`
 Main command. Displays channels, queries, and servers in grouped sections.

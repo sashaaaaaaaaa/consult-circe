@@ -18,7 +18,7 @@
 
 ;; Author: Sasha Abbott <sashaa@disroot.org>
 ;; URL: https://github.com/sashaaaaaaaaa/consult-circe
-;; Version: 0.1
+;; Version: 0.2
 ;; Package-Requires: ((emacs "27.1") (consult "3.3") (circe "2.14"))
 ;; Keywords: comm
 
@@ -27,10 +27,20 @@
 ;; Jump to Circe buffers with Consult.
 ;;
 ;; Based on helm-circe by Les Harris <les@lesharris.com>
-;; (https://github.com/lesharris/helm-circe)
+;; (https://github.com/lesharris/helm-circe) to the completing-read ecosystem.
 ;;
 ;; Each candidate is annotated with its type
 ;; (channel, server, query) and its parent server name.
+;;
+;; Embark integration provides actions on candidates while the minibuffer
+;; is open.  Use `embark-act' (bound to C-, by default) on any candidate:
+;;
+;;   RET / s   switch to buffer
+;;   k         kill/part buffer
+;;
+;; For ibuffer-style mark-and-delete, use `embark-act' then `E' to run
+;; `embark-export', which opens the candidates in an Ibuffer buffer where
+;; you can mark and kill buffers with the usual ibuffer commands.
 ;;
 ;; Entry points:
 ;;
@@ -157,6 +167,34 @@
     :items     ,#'consult-circe--recent-buffers
     :action    ,(lambda (buf) (switch-to-buffer buf)))
   "Consult source for circe buffers with recent activity.")
+
+;;; ---------------------------------------------------------------------------
+;;; Embark integration (optional)
+;;; ---------------------------------------------------------------------------
+
+(defun consult-circe--kill-buffer (candidate)
+  "Kill the circe buffer named CANDIDATE."
+  (when-let ((buf (get-buffer candidate)))
+    (kill-buffer buf)
+    (message "Killed %s" candidate)))
+
+(with-eval-after-load 'embark
+  (defvar consult-circe-embark-actions
+    (let ((map (make-sparse-keymap)))
+      (set-keymap-parent map embark-general-map)
+        (define-key map "s" #'switch-to-buffer)
+      (define-key map "k" #'consult-circe--kill-buffer)
+      map)
+    "Keymap of Embark actions for circe buffer candidates.")
+
+  (setf (alist-get 'circe-buffer embark-keymap-alist)
+        'consult-circe-embark-actions)
+
+  (setf (alist-get 'circe-buffer embark-default-action-overrides)
+        #'switch-to-buffer)
+
+  (setf (alist-get 'circe-buffer embark-exporters-alist)
+        #'embark-export-ibuffer))
 
 ;;; ---------------------------------------------------------------------------
 ;;; Kill command
