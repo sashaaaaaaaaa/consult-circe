@@ -2,7 +2,7 @@
 
 Consult bindings for managing Circe buffers.
 
-A port of [helm-circe](https://github.com/lesharris/helm-circe) by [Les Harris](https://github.com/lesharris) to the [consult](https://github.com/minad/consult) ecosystem.
+Based on [helm-circe](https://github.com/lesharris/helm-circe) by [Les Harris](https://github.com/lesharris), this package provides [consult](https://github.com/minad/consult) bindings for managing Circe buffers.
 
 A call to `consult-circe` will show a grouped list of server, channel, and query buffers currently open. Each candidate is annotated with its type and parent server name.
 
@@ -16,6 +16,33 @@ If [embark](https://github.com/oantolin/embark) is installed, additional actions
 | `k` | Kill/part buffer |
 
 To kill multiple buffers at once — equivalent to ibuffer's mark-and-delete — use `embark-act` then `E` to run `embark-export`, which opens the candidates in an Ibuffer buffer where you can mark and kill with the usual ibuffer commands.
+
+## Installation
+
+### use-package
+```elisp
+(use-package consult-circe
+  :vc (:url "https://github.com/sashaaaaaaaaa/consult-circe"
+       :branch "master"))
+```
+
+### Elpaca
+```elisp
+(elpaca (consult-circe :host github :repo "sashaaaaaaaaa/consult-circe"))
+```
+
+or 
+
+```elisp
+(use-package consult-circe
+  :ensure (:host github :repo "sashaaaaaaaaa/consult-circe"))
+```
+
+### straight
+```elisp
+(straight-use-package
+ '(consult-circe :type git :host github :repo "sashaaaaaaaaa/consult-circe"))
+```
 
 ## Setup
 
