@@ -23,7 +23,7 @@ To kill multiple buffers at once — equivalent to ibuffer's mark-and-delete —
 ```elisp
 (use-package consult-circe
   :vc (:url "https://github.com/sashaaaaaaaaa/consult-circe"
-       :branch "master"))
+	  :rev :newest))
 ```
 
 ### Elpaca
